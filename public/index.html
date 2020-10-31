@@ -134,7 +134,7 @@
 
 <script>
 
-function d3chart(data){
+function d3chart(data,colors){
 
     var width = 450
         height = 450
@@ -149,8 +149,8 @@ function d3chart(data){
       .append("g")
         .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
     
-    var color = d3.scaleOrdinal()
-      .range(d3.schemeDark2);
+  var color = d3.scaleOrdinal()
+     .range(colors);
     
     var pie = d3.pie()
       .sort(null) 
@@ -213,12 +213,13 @@ function d3chart(data){
 function d3jssub() {
     axios.get('http://localhost:3000/budget')
     .then((res)=> {
-    console.log(res);
     var d3chartdata= {};
-    for(var i=0; i < res.data.myBudget.length; i++){
-       d3chartdata[res.data.myBudget[i].title]=res.data.myBudget[i].budget;
+    var colors= [];
+    for(var i=0; i < res.data.length; i++){
+       d3chartdata[res.data[i].title]=res.data[i].budget;
+       colors.push(res.data[i].color);
     } 
-    d3chart(d3chartdata);
+    d3chart(d3chartdata,colors);
     });
 }
 d3jssub();
@@ -229,16 +230,7 @@ var dataSource = {
     datasets: [
         {
         data: [],
-        backgroundColor: [
-            '#ffcd56',
-            '#ff6384',
-            '#36a2eb',
-            '#fd6b19',
-            '#2E4053',
-            '#2ECC71',
-            '#B7950B',
-            '9B59B6',
-        ]
+        backgroundColor: []
     }],
     labels: []
 };
@@ -253,10 +245,10 @@ function createChart() {
 function getBudget() {
 axios.get('http://localhost:3000/budget')
 .then(function (res) {
-    console.log(res.data);
-    for(var i=0; i < res.data.myBudget.length; i++){
-        dataSource.datasets[0].data[i]=res.data.myBudget[i].budget;
-        dataSource.labels[i]= res.data.myBudget[i].title;
+    for(var i=0; i < res.data.length; i++){
+        dataSource.datasets[0].data[i]=res.data[i].budget;
+        dataSource.labels[i]= res.data[i].title;
+        dataSource.datasets[0].backgroundColor[i]=res.data[i].color;
     }
     createChart();
 });
